@@ -16,7 +16,7 @@ from django.http import HttpResponse
 
 def send_otp(number,message):
     url = "https://www.fast2sms.com/dev/bulk"
-    api = "paste your api key here"
+    api = "LlRkNDmOpUMo20TSWga75EzAe1yihcGVnXIYwB8xZsbQC4vf6HWIMd3hBZRe9SjDc12maC8iHw67GoEf"
     querystring = {"authorization":api,"sender_id":"FSTSMS","message":message,"language":"english","route":"p","numbers":number}
     headers = {
         'cache-control': "no-cache"
@@ -24,8 +24,6 @@ def send_otp(number,message):
     return requests.request("GET", url, headers=headers, params=querystring)
 
     
-
-
 def Registration(request):
     if request.method == "POST":
         fm = UserRegistrationForm(request.POST)
@@ -77,9 +75,9 @@ def otpRegistration(request):
             request.session.delete('password')
             request.session.delete('phone_number')
 
-            messages.success(request,'Registration Successfully Done !!')
+            messages.success(request,'Registration successfully done!')
 
-            return redirect('/login/')
+            return redirect('/voter-login/')
         
         else:
             messages.error(request,'Wrong OTP')
@@ -88,7 +86,7 @@ def otpRegistration(request):
     return render(request,'registration-otp.html')
 
 
-def userLogin(request):
+def voterLogin(request):
 
     try :
         if request.session.get('failed') > 2:
@@ -115,8 +113,38 @@ def userLogin(request):
             send_otp(p_number,message)
             return redirect('/login/otp/')
         else:
-            messages.error(request,'username or password is wrong')
-    return render(request,'login.html')
+            messages.error(request,'Username or password is wrong')
+    return render(request,'voter-login.html')
+
+def adminLogin(request):
+
+    try :
+        if request.session.get('failed') > 2:
+            return HttpResponse('<h1> You have to wait for 5 minutes to login again</h1>')
+    except:
+        request.session['failed'] = 0
+        request.session.set_expiry(100)
+
+
+
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request,username=username,password=password)
+        if user is not None:
+            request.session['username'] = username
+            request.session['password'] = password
+            u = User.objects.get(username=username)
+            p = Profile.objects.get(user=u)
+            p_number = p.phone_number
+            otp = random.randint(1000,9999)
+            request.session['login_otp'] = otp
+            message = f'your otp is {otp}'
+            send_otp(p_number,message)
+            return redirect('/login/otp/')
+        else:
+            messages.error(request,'Username or password is wrong')
+    return render(request,'admin-login.html')
 
 def otpLogin(request):
     if request.method == "POST":
@@ -129,17 +157,20 @@ def otpLogin(request):
             if user is not None:
                 login(request,user)
                 request.session.delete('login_otp')
-                messages.success(request,'login successfully')
-                return redirect('/')
+                messages.success(request,'Logged in successfully')
+                return redirect('/main/')
         else:
             messages.error(request,'Wrong OTP')
     return render(request,'login-otp.html')
 
 def home(request):
+    return render(request,'home.html')
+
+def main(request):
     if request.method == "POST":
         otp = random.randint(1000,9999)
         request.session['email_otp'] = otp
-        message = f'your otp is {otp}'
+        message = f'Your otp is {otp}'
         user_email = request.user.email
 
         send_mail(
@@ -151,7 +182,7 @@ def home(request):
         )
         return redirect('/email-verify/')
 
-    return render(request,'home.html')
+    return render(request,'main.html')
 
 def email_verification(request):
     if request.method == "POST":
@@ -162,7 +193,7 @@ def email_verification(request):
            p.email_verified = True
            p.save()
            messages.success(request,f'Your email {request.user.email} is verified now')
-           return redirect('/')
+           return redirect('/main/')
         else:
             messages.error(request,'Wrong OTP')
 
@@ -184,7 +215,7 @@ def forget_password(request):
         )
             return redirect('/forget-password/done/')
         else:
-            messages.error(request,'email address is not exist')
+            messages.error(request,'Email address does not exist')
     return render(request,'forget-password.html')
 
 def change_password(request,uid):
@@ -200,9 +231,9 @@ def change_password(request,uid):
                     user.password = make_password(pass1)
                     user.save()
                     messages.success(request,'Password has been reset successfully')
-                    return redirect('/login/')
+                    return redirect('/voter-login/')
                 else:
-                    return HttpResponse('Two Password did not match')
+                    return HttpResponse('The two passwords entered did not match')
                 
         else:
             return HttpResponse('Wrong URL')
