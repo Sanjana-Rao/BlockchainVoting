@@ -70,6 +70,7 @@
       <div class="container" data-aos="fade-up">
 
         <div class="section-title">
+          <br>
           <h2>Login as Admin</h2>
           <p>Please enter the below details.</p>
         </div>
@@ -87,16 +88,16 @@
         <div class="row justify-content-center">
 
           <div class="col-lg-4">
-            <form method="post" class="php-email-form" novalidate> {% csrf_token%}
+            <form method="post" novalidate> {% csrf_token%}
 
               <div class="form-group mt-3">
                 <input type="text" class="form-control" name="username" placeholder="Username" required>
               </div>
 
               <div class="form-group mt-3">
-                <input type="text" class="form-control" name="password" placeholder="Password" required>
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
               </div>
-              <br>
+              <br><br>
               <div class="text-center"><button type="submit">Login</button></div>
             </form>
           </div>
@@ -104,7 +105,7 @@
         </div>
 
       </div>
-      <br><br>
+      <br><br><br>
 
     </section><!-- End Contact Section -->
 
@@ -125,16 +126,9 @@
             <!-- You can delete the links only if you purchased the pro version. -->
             <!-- Licensing information: https://bootstrapmade.com/license/ -->
             <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/techie-free-skin-bootstrap-3/ -->
-            Developed by <a href="https://bootstrapmade.com/">Team 5</a>
+            Developed by Team 5</a>
           </div>
         </div>
-        <div class="social-links text-center text-md-right pt-3 pt-md-0">
-          <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-          <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
-          <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
-          <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-        </div>
-      </div>
 
     </div>
   </footer><!-- End Footer -->

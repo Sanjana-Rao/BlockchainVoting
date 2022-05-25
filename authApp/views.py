@@ -15,7 +15,7 @@ from django.http import HttpResponse
 
 
 def send_otp(number,message):
-    url = "https://www.fast2sms.com/dev/bulk"
+    url = "https://www.fast2sms.com/dev/bulkV2"
     api = "LlRkNDmOpUMo20TSWga75EzAe1yihcGVnXIYwB8xZsbQC4vf6HWIMd3hBZRe9SjDc12maC8iHw67GoEf"
     querystring = {"authorization":api,"sender_id":"FSTSMS","message":message,"language":"english","route":"p","numbers":number}
     headers = {
@@ -95,8 +95,6 @@ def voterLogin(request):
         request.session['failed'] = 0
         request.session.set_expiry(100)
 
-
-
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -125,26 +123,33 @@ def adminLogin(request):
         request.session['failed'] = 0
         request.session.set_expiry(100)
 
-
-
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request,username=username,password=password)
         if user is not None:
-            request.session['username'] = username
-            request.session['password'] = password
-            u = User.objects.get(username=username)
-            p = Profile.objects.get(user=u)
-            p_number = p.phone_number
-            otp = random.randint(1000,9999)
-            request.session['login_otp'] = otp
-            message = f'your otp is {otp}'
-            send_otp(p_number,message)
-            return redirect('/login/otp/')
+            return redirect('/login/admin/')
         else:
             messages.error(request,'Username or password is wrong')
     return render(request,'admin-login.html')
+
+def adminLoggedIn(request):
+    if request.method == "POST":
+        email = request.POST['email']
+        if User.objects.filter(email=email).exists():
+            uid = User.objects.get(email=email)
+            url = f'http://127.0.0.1:8000/change-password/{uid.profile.uuid}'
+            send_mail(
+            'Reset Password',
+            url,
+            settings.EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )
+            return redirect('/manage-candidates/')
+        else:
+            return render(request,'manage-candidates.html')
+    return render(request,'manage-candidates.html')
 
 def otpLogin(request):
     if request.method == "POST":
