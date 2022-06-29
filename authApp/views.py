@@ -16,7 +16,7 @@ from django.http import HttpResponse
 
 def send_otp(number,message):
     url = "https://www.fast2sms.com/dev/bulkV2"
-    api = "LlRkNDmOpUMo20TSWga75EzAe1yihcGVnXIYwB8xZsbQC4vf6HWIMd3hBZRe9SjDc12maC8iHw67GoEf"
+    api = "urzFhH56mW8LJZpioPUGNYwMX23TtnIcfqsgvCakA1D79elVByVnw8zfZAUSvkeTXqpBhysNd9IoHPWc"
     querystring = {"authorization":api,"sender_id":"FSTSMS","message":message,"language":"english","route":"p","numbers":number}
     headers = {
         'cache-control': "no-cache"
